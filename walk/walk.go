@@ -9,26 +9,26 @@ import (
 )
 
 type WalkOptions struct {
-	PhotoChannel chan []byte
+	MediaChannel chan []byte
 	ErrorChannel chan error
 	DoneChannel  chan bool
 }
 
-type WalkPhotosCallbackFunc func(ctx context.Context, photo []byte) error
+type WalkMediaCallbackFunc func(ctx context.Context, media []byte) error
 
-func WalkPhotosWithCallback(ctx context.Context, photos_fh io.Reader, cb WalkPhotosCallbackFunc) error {
+func WalkMediaWithCallback(ctx context.Context, media_fh io.Reader, cb WalkMediaCallbackFunc) error {
 
 	err_ch := make(chan error)
-	photo_ch := make(chan []byte)
+	media_ch := make(chan []byte)
 	done_ch := make(chan bool)
 
 	walk_opts := &WalkOptions{
 		DoneChannel:  done_ch,
 		ErrorChannel: err_ch,
-		PhotoChannel: photo_ch,
+		MediaChannel: media_ch,
 	}
 
-	go WalkPhotos(ctx, walk_opts, photos_fh)
+	go WalkMedia(ctx, walk_opts, media_fh)
 
 	working := true
 	wg := new(sync.WaitGroup)
@@ -39,7 +39,7 @@ func WalkPhotosWithCallback(ctx context.Context, photos_fh io.Reader, cb WalkPho
 			working = false
 		case err := <-err_ch:
 			return err
-		case body := <-photo_ch:
+		case body := <-media_ch:
 
 			wg.Add(1)
 
@@ -66,7 +66,7 @@ func WalkPhotosWithCallback(ctx context.Context, photos_fh io.Reader, cb WalkPho
 	return nil
 }
 
-func WalkPhotos(ctx context.Context, opts *WalkOptions, photos_fh io.Reader) {
+func WalkMedia(ctx context.Context, opts *WalkOptions, media_fh io.Reader) {
 
 	defer func() {
 		opts.DoneChannel <- true
@@ -74,7 +74,7 @@ func WalkPhotos(ctx context.Context, opts *WalkOptions, photos_fh io.Reader) {
 
 	var archive instagram.Archive
 
-	dec := json.NewDecoder(photos_fh)
+	dec := json.NewDecoder(media_fh)
 	err := dec.Decode(&archive)
 
 	if err != nil {
@@ -98,7 +98,7 @@ func WalkPhotos(ctx context.Context, opts *WalkOptions, photos_fh io.Reader) {
 			continue
 		}
 
-		opts.PhotoChannel <- ph_body
+		opts.MediaChannel <- ph_body
 	}
 
 }
