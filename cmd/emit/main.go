@@ -3,15 +3,14 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/sfomuseum/go-sfomuseum-instagram"
 	"github.com/sfomuseum/go-sfomuseum-instagram/walk"
 	"github.com/tidwall/pretty"
-	"gocloud.dev/blob"
 	_ "gocloud.dev/blob/fileblob"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"sync"
 	"sync/atomic"
 )
@@ -48,18 +47,7 @@ func main() {
 
 	wr := io.MultiWriter(writers...)
 
-	root := filepath.Dir(*media_uri)
-	fname := filepath.Base(*media_uri)
-
-	media_bucket, err := blob.OpenBucket(ctx, root)
-
-	if err != nil {
-		log.Fatalf("Failed to open bucket (%s), %v", root, err)
-	}
-
-	defer media_bucket.Close()
-
-	media_fh, err := media_bucket.NewReader(ctx, fname, nil)
+	media_fh, err := instagram.OpenMedia(ctx, *media_uri)
 
 	if err != nil {
 		log.Fatalf("Failed to open media file, %v", err)
