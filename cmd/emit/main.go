@@ -89,7 +89,7 @@ func main() {
 
 		if *append_id {
 
-			b, err := document.AppendIDFromPath(ctx, body)
+			b, err := document.AppendMediaIDFromPath(ctx, body)
 
 			if err != nil {
 				return err

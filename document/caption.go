@@ -14,13 +14,14 @@ var re_newlines *regexp.Regexp
 
 func init() {
 
-	re_hashtag = regexp.MustCompile(`.*((#([^#\s]+)\s?)+)$`)
+	re_hashtag = regexp.MustCompile(`.*(((?:#|@)([^#@\s]+)\s?)+)$`)
 	re_newlines = regexp.MustCompile(`(\.?\n\.)+$`)
 }
 
 type Caption struct {
 	Body     string   `json:"body"`
 	Hashtags []string `json:"hashtags"`
+	Users    []string `json:"users"`
 }
 
 func ExpandCaption(ctx context.Context, body []byte) ([]byte, error) {
@@ -53,7 +54,9 @@ func ParseCaption(ctx context.Context, body string) (*Caption, error) {
 	m := re_hashtag.FindStringSubmatch(body)
 
 	str_hashtags := ""
+
 	hashtags := make([]string, 0)
+	users := make([]string, 0)
 
 	if len(m) > 0 {
 
@@ -63,11 +66,25 @@ func ParseCaption(ctx context.Context, body string) (*Caption, error) {
 
 		for _, tag := range strings.Split(trim_hashtags, " ") {
 
-			tag = strings.Replace(tag, "#", "", 1)
-			tag = strings.TrimSpace(tag)
+			if strings.HasPrefix(tag, "#") {
+				tag = strings.Replace(tag, "#", "", 1)
+				tag = strings.TrimSpace(tag)
 
-			if tag != "" {
-				hashtags = append(hashtags, tag)
+				if tag != "" {
+					hashtags = append(hashtags, tag)
+				}
+
+			} else if strings.HasPrefix(tag, "@") {
+
+				tag = strings.Replace(tag, "@", "", 1)
+				tag = strings.TrimSpace(tag)
+
+				if tag != "" {
+					users = append(users, tag)
+				}
+
+			} else {
+				// this should never happen
 			}
 		}
 	}
@@ -83,6 +100,7 @@ func ParseCaption(ctx context.Context, body string) (*Caption, error) {
 	caption := &Caption{
 		Body:     body,
 		Hashtags: hashtags,
+		Users:    users,
 	}
 
 	return caption, nil

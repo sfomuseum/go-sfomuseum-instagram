@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func AppendIDFromPath(ctx context.Context, body []byte) ([]byte, error) {
+func AppendMediaIDFromPath(ctx context.Context, body []byte) ([]byte, error) {
 
 	path_rsp := gjson.GetBytes(body, "path")
 
@@ -24,7 +24,7 @@ func AppendIDFromPath(ctx context.Context, body []byte) ([]byte, error) {
 
 	id := strings.Replace(fname, ext, "", 1)
 
-	body, err := sjson.SetBytes(body, "id", id)
+	body, err := sjson.SetBytes(body, "media_id", id)
 
 	if err != nil {
 		return nil, err
