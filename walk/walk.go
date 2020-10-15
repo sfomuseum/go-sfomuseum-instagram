@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/sfomuseum/go-sfomuseum-instagram"
 	"io"
+	_ "log"
 	"sync"
 )
 
@@ -30,13 +31,13 @@ func WalkMediaWithCallback(ctx context.Context, media_fh io.Reader, cb WalkMedia
 
 	go WalkMedia(ctx, walk_opts, media_fh)
 
-	working := true
+	walking := true
 	wg := new(sync.WaitGroup)
 
 	for {
 		select {
 		case <-done_ch:
-			working = false
+			walking = false
 		case err := <-err_ch:
 			return err
 		case body := <-media_ch:
@@ -57,7 +58,7 @@ func WalkMediaWithCallback(ctx context.Context, media_fh io.Reader, cb WalkMedia
 
 		}
 
-		if !working {
+		if !walking {
 			break
 		}
 	}
