@@ -10,12 +10,14 @@ import (
 )
 
 var re_hashtag *regexp.Regexp
+var re_separator *regexp.Regexp
 var re_newlines *regexp.Regexp
 
 func init() {
 
 	re_hashtag = regexp.MustCompile(`.*(((?:#|@)([^#@\s]+)\s?)+)$`)
-	re_newlines = regexp.MustCompile(`(\.?\n\.)+$`)
+	re_separator = regexp.MustCompile(`(\.?\n\.)+$`)
+	re_newlines = regexp.MustCompile(`\n`)
 }
 
 type Caption struct {
@@ -95,7 +97,8 @@ func ParseCaption(ctx context.Context, body string) (*Caption, error) {
 
 	body = strings.TrimSpace(body)
 
-	body = re_newlines.ReplaceAllString(body, "")
+	body = re_separator.ReplaceAllString(body, "")
+	body = re_newlines.ReplaceAllString(body, " ")
 
 	caption := &Caption{
 		Body:     body,

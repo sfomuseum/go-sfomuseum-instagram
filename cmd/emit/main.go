@@ -25,11 +25,11 @@ func main() {
 	as_json := flag.Bool("json", false, "Emit a JSON list.")
 	format_json := flag.Bool("format-json", false, "Format JSON output for each record.")
 
-	append_timestamp := flag.Bool("append-timestamp", false, "...")
-	append_id := flag.Bool("append-id", false, "...")
-	append_all := flag.Bool("append-all", false, "...")
+	append_timestamp := flag.Bool("append-timestamp", false, "Append a `taken` property containing a Unix timestamp derived from the `taken_at` property.")
+	append_id := flag.Bool("append-id", false, "Append a `media_id` property derived from the `path` property.")
+	append_all := flag.Bool("append-all", false, "Enable all the `-append-` flags.")
 
-	expand_caption := flag.Bool("expand-caption", false, "...")
+	expand_caption := flag.Bool("expand-caption", false, "Parse and replace the string `caption` property with a `document.Caption` struct.")
 
 	flag.Parse()
 
