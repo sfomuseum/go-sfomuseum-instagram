@@ -8,10 +8,19 @@ Work in progress. Documentation to follow.
 
 ## Tools
 
-### emit
+To build binary versions of these tools run the `cli` Makefile target. For example:
 
 ```
-> ./bin/emit -h
+$> make cli
+go build -mod vendor -o bin/emit cmd/emit/main.go
+```
+
+### emit
+
+A command-line tool for parsing and emitting individual records from an Instagram `media.json` file.
+
+```
+$> ./bin/emit -h
 Usage of ./bin/emit:
   -append-all -append-
     	Enable all the -append- flags.
