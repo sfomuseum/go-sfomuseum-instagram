@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"github.com/sfomuseum/go-sfomuseum-instagram"
+	"github.com/sfomuseum/go-sfomuseum-instagram/document"
 	"github.com/sfomuseum/go-sfomuseum-instagram/walk"
 	"github.com/tidwall/pretty"
 	_ "gocloud.dev/blob/fileblob"
@@ -24,7 +25,16 @@ func main() {
 	as_json := flag.Bool("json", false, "Emit a JSON list.")
 	format_json := flag.Bool("format-json", false, "Format JSON output for each record.")
 
+	append_timestamp := flag.Bool("append-timestamp", false, "...")
+	append_id := flag.Bool("append-id", false, "...")
+	append_all := flag.Bool("append-all", false, "...")
+
 	flag.Parse()
+
+	if *append_all {
+		*append_timestamp = true
+		*append_id = true
+	}
 
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
@@ -63,6 +73,28 @@ func main() {
 	}
 
 	cb := func(ctx context.Context, body []byte) error {
+
+		if *append_timestamp {
+
+			b, err := document.AppendTakenAtTimestamp(ctx, body)
+
+			if err != nil {
+				return err
+			}
+
+			body = b
+		}
+
+		if *append_id {
+
+			b, err := document.AppendIDFromPath(ctx, body)
+
+			if err != nil {
+				return err
+			}
+
+			body = b
+		}
 
 		mu.Lock()
 		defer mu.Unlock()
