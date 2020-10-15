@@ -29,6 +29,8 @@ func main() {
 	append_id := flag.Bool("append-id", false, "...")
 	append_all := flag.Bool("append-all", false, "...")
 
+	expand_caption := flag.Bool("expand-caption", false, "...")
+
 	flag.Parse()
 
 	if *append_all {
@@ -88,6 +90,17 @@ func main() {
 		if *append_id {
 
 			b, err := document.AppendIDFromPath(ctx, body)
+
+			if err != nil {
+				return err
+			}
+
+			body = b
+		}
+
+		if *expand_caption {
+
+			b, err := document.ExpandCaption(ctx, body)
 
 			if err != nil {
 				return err
