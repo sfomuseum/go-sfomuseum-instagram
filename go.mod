@@ -7,4 +7,5 @@ require (
 	github.com/tidwall/pretty v1.0.2
 	github.com/tidwall/sjson v1.1.2
 	gocloud.dev v0.20.0
+	gopkg.in/neurosnap/sentences.v1 v1.0.6
 )

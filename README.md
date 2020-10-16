@@ -53,25 +53,32 @@ $> ./bin/emit \
 | jq
 
 {
-    "caption": {
-      "body": "When it went up and the wind finally took it out of my hands, it blew my mind…I saw immediately how everyone around me owned the flag. I thought, 'It's better than I ever dreamed.' - Gilbert Baker (1951-2017)  Did you know the #rainbowflag was created right here in San Francisco in 1978? To commemorate the 40th anniversary of the flag's creation, SFO Museum is presenting an exhibition about Gilbert Baker, the flag's creator featuring a flag created by Baker for the ABC television miniseries When We Rise in 2016. The sewing machine and table on display were also used by Gilbert Baker in the show's production.  See \"#ALegacyOfPride: #GilbertBaker and the 40th Anniversary of the #RainbowFlag\" on view pre-security in the International Terminal. http://bit.ly/RainbowFlagSFO",
-      "hashtags": [
-        "GilbertBaker",
-        "RainbowFlag",
-        "ALegacyofPride",
-        "gaypride",
-        "lgbtpride",
-        "pride",
-        "LGBT",
-        "🏳️‍🌈"
-      ],
-      "users": []
-    },
-    "taken_at": "2018-08-09T16:24:20+00:00",
-    "location": "SFO Museum",
-    "path": "photos/201808/956afae7ece4253954366ae5973385c4.jpg",
-    "taken": 1533831860,
-    "media_id": "956afae7ece4253954366ae5973385c4"
-  }
+  "caption": {
+    "body": "In 1994, Gilbert Baker, the original creator of the rainbow flag and a team of volunteers created a mile-long rainbow flag for the 25th Anniversary of the 1969 Stonewall riots. The flag was carried by 5,000 people on First Avenue in New York City. Baker worked tirelessly to ensure the rainbow flag would become a powerful and enduring symbol of pride and inclusion that transcends languages and borders, gender and race, and now, four decades after its creation, generations.  Courtesy of Mick Hicks. See \"#ALegacyOfPride: #GilbertBaker and the 40th Anniversary of the #RainbowFlag\" on view pre-security in the International Terminal. http://bit.ly/RainbowFlagSFO",
+    "excerpt": "In 1994, Gilbert Baker, the original creator of the rainbow flag and a team of volunteers created a mile-long rainbow flag for the 25th Anniversary of the 1969 Stonewall riots.",
+    "hashtags": [
+      "GilbertBaker", 
+      "RainbowFlag", 
+      "ALegacyofPride", 
+      "gaypride", 
+      "lgbtpride", 
+      "pride", 
+      "LGBT", 
+      "🏳️‍🌈", 
+      "👭", 
+      "👬", 
+      "👩‍❤️‍👩", 
+      "👩‍❤️‍💋‍👩", 
+      "👨‍❤️‍👨", 
+      "👨‍❤️‍💋‍👨"
+    ],
+    "users": []
+  },
+  "taken_at": "2018-09-20T03:40:04+00:00",
+  "location": "San Francisco International Airport (SFO)",
+  "path": "photos/201809/0ebfa6dda7247127fb67475768299db2.jpg",
+  "taken": 1537414804,
+  "media_id": "0ebfa6dda7247127fb67475768299db2"
+}
   ... and so on
 ```

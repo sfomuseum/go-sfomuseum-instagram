@@ -133,3 +133,7 @@ google.golang.org/protobuf/runtime/protoimpl
 google.golang.org/protobuf/types/known/anypb
 google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/timestamppb
+# gopkg.in/neurosnap/sentences.v1 v1.0.6
+gopkg.in/neurosnap/sentences.v1
+gopkg.in/neurosnap/sentences.v1/data
+gopkg.in/neurosnap/sentences.v1/english
