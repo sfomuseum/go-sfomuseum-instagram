@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
+	"github.com/aaronland/go-json-query"
 	"github.com/sfomuseum/go-sfomuseum-instagram"
 	"github.com/sfomuseum/go-sfomuseum-instagram/document"
 	"github.com/sfomuseum/go-sfomuseum-instagram/walk"
@@ -12,6 +14,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 )
@@ -30,6 +33,14 @@ func main() {
 	append_all := flag.Bool("append-all", false, "Enable all the `-append-` flags.")
 
 	expand_caption := flag.Bool("expand-caption", false, "Parse and replace the string `caption` property with a `document.Caption` struct.")
+
+	var queries query.QueryFlags
+	flag.Var(&queries, "query", "One or more {PATH}={REGEXP} parameters for filtering records.")
+
+	valid_modes := strings.Join([]string{query.QUERYSET_MODE_ALL, query.QUERYSET_MODE_ANY}, ", ")
+	desc_modes := fmt.Sprintf("Specify how query filtering should be evaluated. Valid modes are: %s", valid_modes)
+
+	query_mode := flag.String("query-mode", query.QUERYSET_MODE_ALL, desc_modes)
 
 	flag.Parse()
 
@@ -131,7 +142,21 @@ func main() {
 		return nil
 	}
 
-	err = walk.WalkMediaWithCallback(ctx, media_fh, cb)
+	walk_opts := &walk.WalkWithCallbackOptions{
+		Callback: cb,
+	}
+
+	if len(queries) > 0 {
+
+		qs := &query.QuerySet{
+			Queries: queries,
+			Mode:    *query_mode,
+		}
+
+		walk_opts.QuerySet = qs
+	}
+
+	err = walk.WalkMediaWithCallback(ctx, walk_opts, media_fh)
 
 	if err != nil {
 		log.Fatal(err)

@@ -3,6 +3,7 @@ package walk
 import (
 	"context"
 	"encoding/json"
+	"github.com/aaronland/go-json-query"
 	"github.com/sfomuseum/go-sfomuseum-instagram"
 	"io"
 	_ "log"
@@ -13,11 +14,17 @@ type WalkOptions struct {
 	MediaChannel chan []byte
 	ErrorChannel chan error
 	DoneChannel  chan bool
+	QuerySet     *query.QuerySet
+}
+
+type WalkWithCallbackOptions struct {
+	Callback WalkMediaCallbackFunc
+	QuerySet *query.QuerySet
 }
 
 type WalkMediaCallbackFunc func(ctx context.Context, media []byte) error
 
-func WalkMediaWithCallback(ctx context.Context, media_fh io.Reader, cb WalkMediaCallbackFunc) error {
+func WalkMediaWithCallback(ctx context.Context, opts *WalkWithCallbackOptions, media_fh io.Reader) error {
 
 	err_ch := make(chan error)
 	media_ch := make(chan []byte)
@@ -27,6 +34,7 @@ func WalkMediaWithCallback(ctx context.Context, media_fh io.Reader, cb WalkMedia
 		DoneChannel:  done_ch,
 		ErrorChannel: err_ch,
 		MediaChannel: media_ch,
+		QuerySet:     opts.QuerySet,
 	}
 
 	go WalkMedia(ctx, walk_opts, media_fh)
@@ -48,7 +56,7 @@ func WalkMediaWithCallback(ctx context.Context, media_fh io.Reader, cb WalkMedia
 
 				defer wg.Done()
 
-				err := cb(ctx, body)
+				err := opts.Callback(ctx, body)
 
 				if err != nil {
 					err_ch <- err
@@ -97,6 +105,21 @@ func WalkMedia(ctx context.Context, opts *WalkOptions, media_fh io.Reader) {
 		if err != nil {
 			opts.ErrorChannel <- err
 			continue
+		}
+
+		if opts.QuerySet != nil {
+
+			matches, err := query.Matches(ctx, opts.QuerySet, ph_body)
+
+			if err != nil {
+
+				opts.ErrorChannel <- err
+				continue
+			}
+
+			if !matches {
+				continue
+			}
 		}
 
 		opts.MediaChannel <- ph_body

@@ -23,7 +23,7 @@ func init() {
 
 type Caption struct {
 	Body     string   `json:"body"`
-	Excerpt string `json:"excerpt"`
+	Excerpt  string   `json:"excerpt"`
 	Hashtags []string `json:"hashtags"`
 	Users    []string `json:"users"`
 }
@@ -101,7 +101,7 @@ func ParseCaption(ctx context.Context, body string) (*Caption, error) {
 
 	body = re_separator.ReplaceAllString(body, "")
 	body = re_newlines.ReplaceAllString(body, " ")
-	
+
 	caption := &Caption{
 		Body:     body,
 		Hashtags: hashtags,
@@ -119,6 +119,6 @@ func ParseCaption(ctx context.Context, body string) (*Caption, error) {
 	if len(sentences) >= 1 {
 		caption.Excerpt = sentences[0].Text
 	}
-	
+
 	return caption, nil
 }

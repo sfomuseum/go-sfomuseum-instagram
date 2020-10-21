@@ -20,7 +20,7 @@ go build -mod vendor -o bin/emit cmd/emit/main.go
 A command-line tool for parsing and emitting individual records from an Instagram `media.json` file.
 
 ```
-$> ./bin/emit -h
+> ./bin/emit -h
 Usage of ./bin/emit:
   -append-all -append-
     	Enable all the -append- flags.
@@ -38,9 +38,13 @@ Usage of ./bin/emit:
     	A valid gocloud.dev/blob URI to your Instagram media.json file.
   -null
     	Emit to /dev/null
+  -query value
+    	One or more {PATH}={REGEXP} parameters for filtering records.
+  -query-mode string
+    	Specify how query filtering should be evaluated. Valid modes are: ALL, ANY (default "ALL")
   -stdout
     	Emit to STDOUT (default true)
-```
+```	
 
 For example:
 
@@ -50,6 +54,8 @@ $> ./bin/emit \
 	-expand-caption \
 	-json \
 	-format-json \
+	-media-uri file:///usr/local/instagram/media.json
+	
 | jq
 
 {
