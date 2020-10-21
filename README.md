@@ -88,3 +88,36 @@ $> ./bin/emit \
 }
   ... and so on
 ```
+
+#### Inline queries
+
+You can also specify inline queries by passing a `-query` parameter which is a string in the format of:
+
+```
+{PATH}={REGULAR EXPRESSION}
+```
+
+Paths follow the dot notation syntax used by the [tidwall/gjson](https://github.com/tidwall/gjson) package and regular expressions are any valid [Go language regular expression](https://golang.org/pkg/regexp/). Successful path lookups will be treated as a list of candidates and each candidate's string value will be tested against the regular expression's [MatchString](https://golang.org/pkg/regexp/#Regexp.MatchString) method.
+
+For example:
+
+```
+...
+```
+
+You can pass multiple `-query` parameters:
+
+```
+...
+```
+
+The default query mode is to ensure that all queries match but you can also specify that only one or more queries need to match by passing the `-query-mode ANY` flag:
+
+```
+...
+```
+
+## See also
+
+* https://github.com/aaronland/go-json-query
+
