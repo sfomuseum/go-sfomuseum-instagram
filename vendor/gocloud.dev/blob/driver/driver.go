@@ -138,12 +138,17 @@ type Attributes struct {
 	// "foo" and "FOO"), only one value will be kept, and it is undefined
 	// which one.
 	Metadata map[string]string
+	// CreateTime is the time the blob object was created. If not available,
+	// leave as the zero time.
+	CreateTime time.Time
 	// ModTime is the time the blob object was last modified.
 	ModTime time.Time
 	// Size is the size of the object in bytes.
 	Size int64
 	// MD5 is an MD5 hash of the blob contents or nil if not available.
 	MD5 []byte
+	// ETag for the blob; see https://en.wikipedia.org/wiki/HTTP_ETag.
+	ETag string
 	// AsFunc allows drivers to expose driver-specific types;
 	// see Bucket.As for more details.
 	// If not set, no driver-specific types are supported.
@@ -330,6 +335,12 @@ type SignedURLOptions struct {
 	//
 	// This field will always be false for non-PUT requests.
 	EnforceAbsentContentType bool
+
+	// BeforeSign is a callback that will be called before each call to the
+	// the underlying service's sign functionality.
+	// asFunc converts its argument to driver-specific types.
+	// See https://gocloud.dev/concepts/as/ for background information.
+	BeforeSign func(asFunc func(interface{}) bool) error
 }
 
 // prefixedBucket implements Bucket by prepending prefix to all keys.
@@ -384,3 +395,40 @@ func (b *prefixedBucket) SignedURL(ctx context.Context, key string, opts *Signed
 	return b.base.SignedURL(ctx, b.prefix+key, opts)
 }
 func (b *prefixedBucket) Close() error { return b.base.Close() }
+
+// singleKeyBucket implements Bucket by hardwiring a specific key.
+type singleKeyBucket struct {
+	base Bucket
+	key  string
+}
+
+// NewSingleKeyBucket returns a Bucket based on b that always references key.
+func NewSingleKeyBucket(b Bucket, key string) Bucket {
+	return &singleKeyBucket{base: b, key: key}
+}
+
+func (b *singleKeyBucket) ErrorCode(err error) gcerrors.ErrorCode { return b.base.ErrorCode(err) }
+func (b *singleKeyBucket) As(i interface{}) bool                  { return b.base.As(i) }
+func (b *singleKeyBucket) ErrorAs(err error, i interface{}) bool  { return b.base.ErrorAs(err, i) }
+func (b *singleKeyBucket) Attributes(ctx context.Context, _ string) (*Attributes, error) {
+	return b.base.Attributes(ctx, b.key)
+}
+func (b *singleKeyBucket) ListPaged(ctx context.Context, opts *ListOptions) (*ListPage, error) {
+	return nil, errors.New("List not supported for SingleKey buckets")
+}
+func (b *singleKeyBucket) NewRangeReader(ctx context.Context, _ string, offset, length int64, opts *ReaderOptions) (Reader, error) {
+	return b.base.NewRangeReader(ctx, b.key, offset, length, opts)
+}
+func (b *singleKeyBucket) NewTypedWriter(ctx context.Context, _, contentType string, opts *WriterOptions) (Writer, error) {
+	return b.base.NewTypedWriter(ctx, b.key, contentType, opts)
+}
+func (b *singleKeyBucket) Copy(ctx context.Context, dstKey, _ string, opts *CopyOptions) error {
+	return b.base.Copy(ctx, dstKey, b.key, opts)
+}
+func (b *singleKeyBucket) Delete(ctx context.Context, _ string) error {
+	return b.base.Delete(ctx, b.key)
+}
+func (b *singleKeyBucket) SignedURL(ctx context.Context, _ string, opts *SignedURLOptions) (string, error) {
+	return b.base.SignedURL(ctx, b.key, opts)
+}
+func (b *singleKeyBucket) Close() error { return b.base.Close() }
