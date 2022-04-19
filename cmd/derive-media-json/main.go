@@ -21,11 +21,11 @@ type Post struct {
 	MediaId string  `json:"media_id"`
 	Path    string  `json:"path"`
 	Taken   string  `json:"taken"`
-	Caption Caption `json:"caption"`
+	Caption *Caption `json:"caption"`
 }
 
 type Media struct {
-	Posts []Post
+	Posts []*Post
 }
 
 func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
@@ -100,14 +100,16 @@ func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
 
 					taken = first.Data
 
-					p := &Post{
-						MediaId: media_id,
-						Path:    path,
-						Taken:   taken,
+					if path != "" {
+						p := &Post{
+							MediaId: media_id,
+							Path:    path,
+							Taken:   taken,
+						}
+						
+						posts = append(posts, p)
 					}
-
-					posts = append(posts, p)
-
+					
 					media_id = ""
 					path = ""
 					taken = ""
@@ -211,6 +213,28 @@ func parseComments(ctx context.Context, r io.Reader) (map[string]string, error) 
 	return comments, nil
 }
 
+func merge(ctx context.Context, posts []*Post, comments map[string]string) {
+
+	for _, p := range posts {
+
+		t := p.Taken
+
+		text, exists := comments[t]
+
+		if !exists {
+			// log.Println("NOPE", t)
+			continue
+		}
+
+		p.Caption = &Caption{
+			Excerpt: text,
+		}
+
+		delete(comments, t)
+	}
+
+}
+
 func main() {
 
 	posts := flag.String("posts", "", "...")
@@ -248,9 +272,9 @@ func main() {
 		log.Fatalf("Failed to parse comments, %v", err)
 	}
 
+	merge(ctx, p, c)
+	
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent(" ", " ")
 	enc.Encode(p)
-
-	enc.Encode(c)
 }
