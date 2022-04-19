@@ -10,6 +10,7 @@ import (
 	_ "log"
 	"net/url"
 	"path/filepath"
+	"time"
 )
 
 // type Caption is a struct containing data associated with the caption for an Instragram psot
@@ -31,7 +32,7 @@ type Post struct {
 	// Path is the relative URI for the media element associated with the post
 	Path string `json:"path"`
 	// Taken is the datetime string when the post was published
-	Taken string `json:"taken"`
+	TakenAt string `json:"taken_at"`
 	// Caption is the caption associated with the post
 	Caption *Caption `json:"caption"`
 }
@@ -107,6 +108,16 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 					taken = n.FirstChild.Data
 					is_taken = false
 
+					taken_at := ""
+
+					t, err := time.Parse("Jan 2, 2006, 3:04 PM", taken)
+
+					if err == nil {
+						taken_at = t.Format(time.RFC3339)
+					}
+
+					// log.Println(taken ,taken_at)
+
 					if path != "" {
 
 						c := &Caption{
@@ -118,7 +129,7 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 						p := &Post{
 							Path:    path,
 							MediaId: media_id,
-							Taken:   taken,
+							TakenAt: taken_at,
 							Caption: c,
 						}
 
