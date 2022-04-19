@@ -2,6 +2,12 @@
 
 Go package for working with Instagram archives.
 
+## Documentation
+
+Documentation is incomplete at this time.
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/sfomuseum/go-sfomuseum-instagram.svg)](https://pkg.go.dev/github.com/sfomuseum/go-sfomuseum-instagram)
+
 ## Tools
 
 To build binary versions of these tools run the `cli` Makefile target. For example:
