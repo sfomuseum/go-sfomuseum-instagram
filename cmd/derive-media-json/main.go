@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/sfomuseum/go-sfomuseum-instagram/caption"
 	"golang.org/x/net/html"
 	"io"
 	"log"
@@ -25,10 +26,9 @@ type Caption struct {
 	// Excerpt is the body of the caption
 	Excerpt string `json:"excerpt,omitempty"`
 	// Body is the body of the caption
-	Body string `json:"body"`
+	Body     string   `json:"body"`
 	HashTags []string `json:"hashtags,omitempty"`
-	Users []string `json:"users,omitempty"`	
-	
+	Users    []string `json:"users,omitempty"`
 }
 
 // type Post is a struct containing data associated with an Instagram post
@@ -56,7 +56,10 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 	var media_id string
 	var path string
 	var taken string
-	var caption string
+	var body string
+
+	var tags []string
+	var users []string
 
 	var f func(*html.Node)
 
@@ -88,12 +91,21 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 				}
 
 				if is_caption {
-					
-					caption = n.FirstChild.Data
 
-					// To do: derive hash tags...
-					// To do: derive users...					
-					
+					body = n.FirstChild.Data
+
+					t, err := caption.DeriveHashTagsFromCaption(body)
+
+					if err == nil {
+						tags = t
+					}
+
+					u, err := caption.DeriveUserNamesFromCaption(body)
+
+					if err == nil {
+						users = u
+					}
+
 					is_caption = false
 				}
 
@@ -104,13 +116,18 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 
 					if path != "" {
 
+						log.Println(users)
+						c := &Caption{
+							Body:     body,
+							HashTags: tags,
+							Users:    users,
+						}
+
 						p := &Post{
 							Path:    path,
 							MediaId: media_id,
 							Taken:   taken,
-							Caption: &Caption{
-								Body: caption,
-							},
+							Caption: c,
 						}
 
 						posts = append(posts, p)
@@ -118,8 +135,11 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 
 					path = ""
 					media_id = ""
-					caption = ""
+					body = ""
 					taken = ""
+
+					tags = []string{}
+					users = []string{}
 
 				}
 

@@ -208,8 +208,6 @@ It is expected that this tool is brittle precisely because it is parsing non-str
 This tool does not support the following yet:
 
 * Video posts
-* Itemized hash tags per post
-* Itemized user accounts per post
 
 ## See also
 
