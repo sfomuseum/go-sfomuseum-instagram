@@ -2,10 +2,6 @@
 
 Go package for working with Instagram archives.
 
-## Important
-
-Work in progress. Documentation to follow.
-
 ## Tools
 
 To build binary versions of these tools run the `cli` Makefile target. For example:
@@ -13,6 +9,7 @@ To build binary versions of these tools run the `cli` Makefile target. For examp
 ```
 $> make cli
 go build -mod vendor -o bin/emit cmd/emit/main.go
+go build -mod vendor -o bin/derive-media-json cmd/derive-media-json/main.go
 ```
 
 ### emit
