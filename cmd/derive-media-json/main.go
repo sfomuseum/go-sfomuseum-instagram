@@ -39,6 +39,7 @@ func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
 	posts := make([]*Post, 0)
 
 	is_post := false
+	is_timestamp := false
 
 	var media_id string
 	var path string
@@ -69,24 +70,6 @@ func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
 
 		if is_post {
 
-			if path != "" {
-
-				p := &Post{
-					MediaId: media_id,
-					Path:    path,
-					Taken:   taken,
-				}
-
-				posts = append(posts, p)
-
-				media_id = ""
-				path = ""
-				taken = ""
-			}
-		}
-
-		if is_post {
-
 			if n.Type == html.ElementNode && n.Data == "img" {
 
 				for _, a := range n.Attr {
@@ -105,6 +88,34 @@ func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
 					}
 				}
 
+			}
+
+			if n.Type == html.ElementNode && n.Data == "td" {
+
+				first := n.FirstChild
+
+				if first.Data == "Creation Timestamp" {
+					is_timestamp = true
+				} else if is_timestamp {
+
+					taken = first.Data
+
+					p := &Post{
+						MediaId: media_id,
+						Path:    path,
+						Taken:   taken,
+					}
+
+					posts = append(posts, p)
+
+					media_id = ""
+					path = ""
+					taken = ""
+
+					is_timestamp = false
+
+				} else {
+				}
 			}
 		}
 
