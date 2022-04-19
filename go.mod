@@ -9,5 +9,6 @@ require (
 	github.com/tidwall/pretty v1.2.0
 	github.com/tidwall/sjson v1.2.4
 	gocloud.dev v0.25.0
+	golang.org/x/net v0.0.0-20220401154927-543a649e0bdd
 	gopkg.in/neurosnap/sentences.v1 v1.0.7
 )
