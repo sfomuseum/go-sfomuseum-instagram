@@ -174,6 +174,42 @@ The default query mode is to ensure that all queries match but you can also spec
 ]
 ```
 
+#### derive-media-json
+
+`derive-media-json` is a command line tool to derive an abbreviated "media.json" file from a "contents/posts-(N).html" file as published by the Instagram export tool, circa April 2022.
+
+Previous Instagram export data bundles (circa October, 2020) used to provide one or more "media-(N).json" files that contained machine-readable properties for working with Instagram exports. This tool attempts to reconstruct that data derived from HTML markup and outputs the results as JSON to STDOUT. For example:
+
+```
+$> bin/derive-media-json /usr/local/instagram-export/contents/posts_1.html
+
+[
+  {
+   "media_id": "25fb5d2705094dc3dcd7fa433adbb4cd4c9653f1",
+   "path": "media/posts/201502/1209467_621332467997055_325446168_n_17841739630062499.jpg",
+   "taken": "Feb 26, 2015, 3:07 PM",
+   "caption": {
+    "body": "\"Making art is like escaping to find peace of mind.\" -Lee Kang Hyo (b. 1961). A final image from Dual Natures in Ceramics before the exhibition is deinstalled tomorrow. #DualNatures #Korean #ceramics #pottery"
+   }
+  },
+  {
+   "media_id": "30be7ab6763be9c0f2eae7d7ee57faa43a780116",
+   "path": "media/posts/201502/10986292_690732684371255_1179212910_n_17841739627062499.jpg",
+   "taken": "Feb 13, 2015, 3:15 PM",
+   "caption": {
+    "body": "Gorgeous and golden details emphasize the exotic elements on this 1860s-70s table stand. #EgyptianRevival #furniture #design"
+   }
+   ... and so on
+```
+
+##### Caveats
+
+This tool does not support the following yet:
+
+* Video posts
+* Itemized hash tags per post
+* Itemized user accounts per post
+
 ## See also
 
 * https://github.com/aaronland/go-json-query

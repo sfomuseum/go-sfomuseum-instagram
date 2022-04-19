@@ -1,3 +1,10 @@
+// derive-media-json is a command line tool to derive an abbreviated "media.json" file from a
+// "contents/posts-(N).html" file as published by the Instagram export tool, circa April 2022. Previous
+// Instagram export data bundles (circa October, 2020) used to provide one or more "media-(N).json"
+// files that contained machine-readable properties for working with Instagram exports. This tool
+// attempts to reconstruct that data derived from HTML markup and outputs the results as JSON to STDOUT.
+// For example:
+// 	$> bin/derive-media-json /usr/local/instagram-export/contents/posts_1.html
 package main
 
 import (
@@ -13,22 +20,32 @@ import (
 	"path/filepath"
 )
 
+// type Caption is a struct containing data associated with the caption for an Instragram psot
 type Caption struct {
-	Excerpt string `json:"excerpt"`
+	// Excerpt is the body of the caption
+	Excerpt string `json:"excerpt,omitempty"`
+	// Body is the body of the caption
+	Body string `json:"body"`
+	HashTags []string `json:"hashtags,omitempty"`
+	Users []string `json:"users,omitempty"`	
+	
 }
 
+// type Post is a struct containing data associated with an Instagram post
 type Post struct {
-	MediaId string  `json:"media_id"`
-	Path    string  `json:"path"`
-	Taken   string  `json:"taken"`
+	// MediaId is the SHA-1 hash of the basename for the path of the media element associated with the post
+	MediaId string `json:"media_id"`
+	// Path is the relative URI for the media element associated with the post
+	Path string `json:"path"`
+	// Taken is the datetime string when the post was published
+	Taken string `json:"taken"`
+	// Caption is the caption associated with the post
 	Caption *Caption `json:"caption"`
 }
 
-type Media struct {
-	Posts []*Post
-}
-
-func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
+// DerivePostsFromReader will derive zero or more Instagram posts from the body of 'r' appending
+// each to 'posts'.
+func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*Post, error) {
 
 	doc, err := html.Parse(r)
 
@@ -36,41 +53,77 @@ func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
 		return nil, fmt.Errorf("Failed to parse HTML, %w", err)
 	}
 
-	posts := make([]*Post, 0)
-
-	is_post := false
-	is_timestamp := false
-
 	var media_id string
 	var path string
 	var taken string
+	var caption string
 
 	var f func(*html.Node)
 
 	f = func(n *html.Node) {
 
-		// fmt.Println(n.Data)
+		if n.Type == html.ElementNode {
 
-		if n.Type == html.ElementNode && n.Data == "div" {
+			if n.Data == "div" {
 
-			for _, a := range n.Attr {
+				is_caption := false
+				is_taken := false
 
-				switch a.Key {
-				case "class":
+				for _, a := range n.Attr {
 
-					if a.Val == "_a6-p" {
-						is_post = true
+					switch a.Key {
+					case "class":
+
+						if a.Val == "_3-95 _2pim _a6-h _a6-i" {
+							is_caption = true
+						}
+
+						if a.Val == "_3-94 _a6-o" {
+							is_taken = true
+						}
+
+					default:
+						// pass
+					}
+				}
+
+				if is_caption {
+					
+					caption = n.FirstChild.Data
+
+					// To do: derive hash tags...
+					// To do: derive users...					
+					
+					is_caption = false
+				}
+
+				if is_taken {
+
+					taken = n.FirstChild.Data
+					is_taken = false
+
+					if path != "" {
+
+						p := &Post{
+							Path:    path,
+							MediaId: media_id,
+							Taken:   taken,
+							Caption: &Caption{
+								Body: caption,
+							},
+						}
+
+						posts = append(posts, p)
 					}
 
-				default:
-					// pass
+					path = ""
+					media_id = ""
+					caption = ""
+					taken = ""
+
 				}
-			}
-		}
 
-		if is_post {
-
-			if n.Type == html.ElementNode && n.Data == "img" {
+			} else if n.Data == "img" {
 
 				for _, a := range n.Attr {
 
@@ -88,37 +141,9 @@ func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
 					}
 				}
 
+			} else {
 			}
 
-			if n.Type == html.ElementNode && n.Data == "td" {
-
-				first := n.FirstChild
-
-				if first.Data == "Creation Timestamp" {
-					is_timestamp = true
-				} else if is_timestamp {
-
-					taken = first.Data
-
-					if path != "" {
-						p := &Post{
-							MediaId: media_id,
-							Path:    path,
-							Taken:   taken,
-						}
-						
-						posts = append(posts, p)
-					}
-					
-					media_id = ""
-					path = ""
-					taken = ""
-
-					is_timestamp = false
-
-				} else {
-				}
-			}
 		}
 
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -131,150 +156,34 @@ func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
 	return posts, nil
 }
 
-func parseComments(ctx context.Context, r io.Reader) (map[string]string, error) {
-
-	doc, err := html.Parse(r)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to parse HTML, %w", err)
-	}
-
-	comments := make(map[string]string)
-
-	is_comment := false
-	is_timestamp := false
-	is_owner := false
-
-	text := ""
-	timestamp := ""
-	owner := ""
-
-	var f func(*html.Node)
-
-	f = func(n *html.Node) {
-
-		// fmt.Println(n.Data)
-
-		if n.Type == html.ElementNode && n.Data == "td" {
-
-			first := n.FirstChild
-
-			if first == nil {
-				// pass
-			} else if first.Data == "Comment" {
-				is_comment = true
-			} else if first.Data == "Comment creation time" {
-				is_timestamp = true
-			} else if first.Data == "Media owner" {
-				is_owner = true
-			} else if is_comment {
-
-				// better error checking; is nil?
-				text = first.FirstChild.Data
-				is_comment = false
-
-			} else if is_timestamp {
-
-				timestamp = first.Data
-				is_timestamp = false
-
-			} else if is_owner {
-
-				// better error checking; is nil?
-				owner = first.FirstChild.Data
-				is_owner = false
-
-				if owner == "sfomuseum" {
-
-					_, exists := comments[timestamp]
-
-					if exists {
-						log.Println("ERP")
-					} else {
-						comments[timestamp] = text
-					}
-				}
-
-				text = ""
-				timestamp = ""
-				owner = ""
-
-			} else {
-			}
-		}
-
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			f(c)
-		}
-	}
-
-	f(doc)
-
-	return comments, nil
-}
-
-func merge(ctx context.Context, posts []*Post, comments map[string]string) {
-
-	for _, p := range posts {
-
-		t := p.Taken
-
-		text, exists := comments[t]
-
-		if !exists {
-			// log.Println("NOPE", t)
-			continue
-		}
-
-		p.Caption = &Caption{
-			Excerpt: text,
-		}
-
-		delete(comments, t)
-	}
-
-}
-
 func main() {
-
-	posts := flag.String("posts", "", "...")
-	comments := flag.String("comments", "", "...")
 
 	flag.Parse()
 
 	ctx := context.Background()
 
-	posts_r, err := os.Open(*posts)
+	posts := make([]*Post, 0)
 
-	if err != nil {
-		log.Fatalf("Failed to open %s, %v", *posts, err)
+	paths := flag.Args()
+
+	for _, path := range paths {
+
+		posts_r, err := os.Open(path)
+
+		if err != nil {
+			log.Fatalf("Failed to open %s, %v", path, err)
+		}
+
+		defer posts_r.Close()
+
+		posts, err = DerivePostsFromReader(ctx, posts_r, posts)
+
+		if err != nil {
+			log.Fatalf("Failed to parse posts for %s, %v", path, err)
+		}
 	}
 
-	defer posts_r.Close()
-
-	p, err := parsePosts(ctx, posts_r)
-
-	if err != nil {
-		log.Fatalf("Failed to parse posts, %v", err)
-	}
-
-	comments_r, err := os.Open(*comments)
-
-	if err != nil {
-		log.Fatalf("Failed to open %s, %v", *comments, err)
-	}
-
-	defer comments_r.Close()
-
-	c, err := parseComments(ctx, comments_r)
-
-	if err != nil {
-		log.Fatalf("Failed to parse comments, %v", err)
-	}
-
-	merge(ctx, p, c)
-	
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent(" ", " ")
-	enc.Encode(p)
+	enc.Encode(posts)
 }
