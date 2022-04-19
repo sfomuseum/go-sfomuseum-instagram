@@ -129,10 +129,92 @@ func parsePosts(ctx context.Context, r io.Reader) ([]*Post, error) {
 	return posts, nil
 }
 
+func parseComments(ctx context.Context, r io.Reader) (map[string]string, error) {
+
+	doc, err := html.Parse(r)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse HTML, %w", err)
+	}
+
+	comments := make(map[string]string)
+
+	is_comment := false
+	is_timestamp := false
+	is_owner := false
+
+	text := ""
+	timestamp := ""
+	owner := ""
+
+	var f func(*html.Node)
+
+	f = func(n *html.Node) {
+
+		// fmt.Println(n.Data)
+
+		if n.Type == html.ElementNode && n.Data == "td" {
+
+			first := n.FirstChild
+
+			if first == nil {
+				// pass
+			} else if first.Data == "Comment" {
+				is_comment = true
+			} else if first.Data == "Comment creation time" {
+				is_timestamp = true
+			} else if first.Data == "Media owner" {
+				is_owner = true
+			} else if is_comment {
+
+				// better error checking; is nil?
+				text = first.FirstChild.Data
+				is_comment = false
+
+			} else if is_timestamp {
+
+				timestamp = first.Data
+				is_timestamp = false
+
+			} else if is_owner {
+
+				// better error checking; is nil?
+				owner = first.FirstChild.Data
+				is_owner = false
+
+				if owner == "sfomuseum" {
+
+					_, exists := comments[timestamp]
+
+					if exists {
+						log.Println("ERP")
+					} else {
+						comments[timestamp] = text
+					}
+				}
+
+				text = ""
+				timestamp = ""
+				owner = ""
+
+			} else {
+			}
+		}
+
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+
+	f(doc)
+
+	return comments, nil
+}
+
 func main() {
 
 	posts := flag.String("posts", "", "...")
-	// comments := flag.String("comments", "", "...")
+	comments := flag.String("comments", "", "...")
 
 	flag.Parse()
 
@@ -152,7 +234,23 @@ func main() {
 		log.Fatalf("Failed to parse posts, %v", err)
 	}
 
+	comments_r, err := os.Open(*comments)
+
+	if err != nil {
+		log.Fatalf("Failed to open %s, %v", *comments, err)
+	}
+
+	defer comments_r.Close()
+
+	c, err := parseComments(ctx, comments_r)
+
+	if err != nil {
+		log.Fatalf("Failed to parse comments, %v", err)
+	}
+
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent(" ", " ")
 	enc.Encode(p)
+
+	enc.Encode(c)
 }
