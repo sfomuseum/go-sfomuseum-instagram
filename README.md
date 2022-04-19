@@ -211,10 +211,6 @@ $> bin/derive-media-json /usr/local/instagram-export/contents/posts_1.html
 
 It is expected that this tool is brittle precisely because it is parsing non-structured data observed at a moment in time. This tool has been demonstrated to work with Instagram exports as published in April, 2022 but there are no guarantees that this tool will with future (or past) Instagram exports. This tool should not need to exist but until equivalent machine-readable data is published by Instagram it will have to do.
 
-This tool does not support the following yet:
-
-* Video posts
-
 ## See also
 
 * https://github.com/aaronland/go-json-query

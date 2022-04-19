@@ -7,6 +7,8 @@ import (
 	"github.com/sfomuseum/go-sfomuseum-instagram/caption"
 	"golang.org/x/net/html"
 	"io"
+	_ "log"
+	"net/url"
 	"path/filepath"
 )
 
@@ -15,9 +17,11 @@ type Caption struct {
 	// Excerpt is the body of the caption
 	Excerpt string `json:"excerpt,omitempty"`
 	// Body is the body of the caption
-	Body     string   `json:"body"`
+	Body string `json:"body"`
+	// HashTags is the list of hash tags contained in the body of the caption
 	HashTags []string `json:"hashtags,omitempty"`
-	Users    []string `json:"users,omitempty"`
+	// Users is the list of user names contained in the body of the caption
+	Users []string `json:"users,omitempty"`
 }
 
 // type Post is a struct containing data associated with an Instagram post
@@ -131,14 +135,42 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 
 				}
 
+			} else if n.Data == "a" {
+
+				for _, a := range n.Attr {
+
+					switch a.Key {
+					case "href":
+
+						if filepath.Ext(a.Val) == ".mp4" {
+
+							u, err := url.Parse(a.Val)
+
+							if err == nil {
+
+								path = u.Path
+								fname := filepath.Base(path)
+
+								data := []byte(fname)
+								media_id = fmt.Sprintf("%x", sha1.Sum(data))
+							}
+
+						}
+
+					default:
+						// pass
+					}
+
+				}
+
 			} else if n.Data == "img" {
 
 				for _, a := range n.Attr {
 
 					switch a.Key {
 					case "src":
-						path = a.Val
 
+						path = a.Val
 						fname := filepath.Base(path)
 
 						data := []byte(fname)
