@@ -176,7 +176,7 @@ The default query mode is to ensure that all queries match but you can also spec
 
 #### derive-media-json
 
-`derive-media-json` is a command line tool to derive an abbreviated "media.json" file from a "contents/posts-(N).html" file as published by the Instagram export tool, circa April 2022.
+`derive-media-json` is a command line tool to derive an abbreviated "media.json" file from a "contents/posts-(N).html" file as published by the Instagram export tool, circa April, 2022.
 
 Previous Instagram export data bundles (circa October, 2020) used to provide one or more "media-(N).json" files that contained machine-readable properties for working with Instagram exports. This tool attempts to reconstruct that data derived from HTML markup and outputs the results as JSON to STDOUT.
 
@@ -206,7 +206,7 @@ $> bin/derive-media-json /usr/local/instagram-export/contents/posts_1.html
 
 ##### Caveats
 
-It is expected that this tool is brittle precisely because it is parsing non-structured data observed at a moment in time. This tool has been demonstrated to work with Instagram exports as published in April 2022 but there are no guarantees that this tool will with future (or past) Instagram exports. This tool _should not need to exist_ but until equivalent machine-readable data is published by Instagram it will have to do.
+It is expected that this tool is brittle precisely because it is parsing non-structured data observed at a moment in time. This tool has been demonstrated to work with Instagram exports as published in April, 2022 but there are no guarantees that this tool will with future (or past) Instagram exports. This tool should not need to exist but until equivalent machine-readable data is published by Instagram it will have to do.
 
 This tool does not support the following yet:
 
