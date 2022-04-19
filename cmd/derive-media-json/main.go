@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"github.com/sfomuseum/go-sfomuseum-instagram"	
 	"github.com/sfomuseum/go-sfomuseum-instagram/media"
 	"log"
 	"os"
@@ -22,7 +23,7 @@ func main() {
 
 	ctx := context.Background()
 
-	posts := make([]*media.Post, 0)
+	photos := make([]*instagram.Photo, 0)
 
 	paths := flag.Args()
 
@@ -36,14 +37,18 @@ func main() {
 
 		defer posts_r.Close()
 
-		posts, err = media.DerivePostsFromReader(ctx, posts_r, posts)
+		photos, err = media.DerivePhotosFromReader(ctx, posts_r, photos)
 
 		if err != nil {
-			log.Fatalf("Failed to parse posts for %s, %v", path, err)
+			log.Fatalf("Failed to parse photos for %s, %v", path, err)
 		}
+	}
+
+	archive := instagram.Archive{
+		Photos: photos,
 	}
 
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent(" ", " ")
-	enc.Encode(posts)
+	enc.Encode(archive)
 }

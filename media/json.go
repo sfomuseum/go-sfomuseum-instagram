@@ -4,10 +4,11 @@ import (
 	"context"
 	"crypto/sha1"
 	"fmt"
-	"github.com/sfomuseum/go-sfomuseum-instagram/caption"
+	"github.com/sfomuseum/go-sfomuseum-instagram"
+	_ "github.com/sfomuseum/go-sfomuseum-instagram/caption"
 	"golang.org/x/net/html"
 	"io"
-	_ "log"
+	"log"
 	"net/url"
 	"path/filepath"
 	"time"
@@ -37,9 +38,9 @@ type Post struct {
 	Caption *Caption `json:"caption"`
 }
 
-// DerivePostsFromReader will derive zero or more Instagram posts from the body of 'r' appending
-// each to 'posts'.
-func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*Post, error) {
+// DerivePhotosFromReader will derive zero or more Instagram photos from the body of 'r' appending
+// each to 'photos'.
+func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*instagram.Photo) ([]*instagram.Photo, error) {
 
 	doc, err := html.Parse(r)
 
@@ -52,8 +53,8 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 	var taken string
 	var body string
 
-	var tags []string
-	var users []string
+	// var tags []string
+	// var users []string
 
 	var f func(*html.Node)
 
@@ -88,6 +89,7 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 
 					body = n.FirstChild.Data
 
+					/*
 					t, err := caption.DeriveHashTagsFromCaption(body)
 
 					if err == nil {
@@ -99,7 +101,8 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 					if err == nil {
 						users = u
 					}
-
+*/
+					
 					is_caption = false
 				}
 
@@ -120,29 +123,33 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 
 					if path != "" {
 
-						c := &Caption{
+						/*
+						c := &instagram.Caption{
 							Body:     body,
 							HashTags: tags,
 							Users:    users,
 						}
-
-						p := &Post{
-							Path:    path,
-							MediaId: media_id,
+						*/
+						
+						p := &instagram.Photo{
+							Path: path,
+							// MediaId: media_id,
 							TakenAt: taken_at,
-							Caption: c,
+							Caption: body,
 						}
 
-						posts = append(posts, p)
+						photos = append(photos, p)
 					}
 
+					log.Println(media_id)
+					
 					path = ""
 					media_id = ""
 					body = ""
 					taken = ""
 
-					tags = []string{}
-					users = []string{}
+					// tags = []string{}
+					// users = []string{}
 
 				}
 
@@ -204,5 +211,5 @@ func DerivePostsFromReader(ctx context.Context, r io.Reader, posts []*Post) ([]*
 
 	f(doc)
 
-	return posts, nil
+	return photos, nil
 }

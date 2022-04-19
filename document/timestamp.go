@@ -13,7 +13,7 @@ func AppendTakenAtTimestamp(ctx context.Context, body []byte) ([]byte, error) {
 	created_rsp := gjson.GetBytes(body, "taken_at")
 
 	if !created_rsp.Exists() {
-		return nil, errors.New("Missing created_at property")
+		return nil, errors.New("Missing taken_at property")
 	}
 
 	str_created := created_rsp.String()
