@@ -2,7 +2,6 @@ package media
 
 import (
 	"context"
-	"crypto/sha1"
 	"fmt"
 	"golang.org/x/net/html"
 	"io"
@@ -21,7 +20,7 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 		return nil, fmt.Errorf("Failed to parse HTML, %w", err)
 	}
 
-	var media_id string
+	// var media_id string
 	var path string
 	var taken string
 	var caption string
@@ -77,22 +76,21 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 
 					if path != "" {
 
-						fname := filepath.Base(path)
-						data := []byte(fname)
-						media_id = fmt.Sprintf("%x", sha1.Sum(data))
+						// fname := filepath.Base(path)
+						// media_id = DeriveMediaIdFromString(fname)
 
 						p := &Photo{
 							Path:    path,
 							TakenAt: taken_at,
 							Caption: caption,
-							MediaId: media_id,
+							// MediaId: media_id,
 						}
 
 						photos = append(photos, p)
 					}
 
 					path = ""
-					media_id = ""
+					// media_id = ""
 					caption = ""
 					taken = ""
 				}
