@@ -2,18 +2,21 @@ package media
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
 	"time"
 )
 
+// AppendTakenAtTimestamp will look for a `taken_at` JSON property in 'body' and use
+// its value to derive a Unix timestamp which will be used as the value of a new
+// `taken` JSON property (which is appended to 'body').
 func AppendTakenAtTimestamp(ctx context.Context, body []byte) ([]byte, error) {
 
 	created_rsp := gjson.GetBytes(body, "taken_at")
 
 	if !created_rsp.Exists() {
-		return nil, errors.New("Missing taken_at property")
+		return nil, fmt.Errorf("Missing taken_at property")
 	}
 
 	str_created := created_rsp.String()
@@ -24,13 +27,13 @@ func AppendTakenAtTimestamp(ctx context.Context, body []byte) ([]byte, error) {
 	t, err := time.Parse(t_fmt, str_created)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to parse taken value (%s), %w", str_created, err)
 	}
 
 	body, err = sjson.SetBytes(body, "taken", t.Unix())
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to assign taken property, %w", err)
 	}
 
 	return body, nil

@@ -8,6 +8,9 @@ import (
 	"path/filepath"
 )
 
+// Open is a convenience method to create a new `blob.Bucket` instance derived from the
+// root directory in 'media_uri' and then using that bucket to return a new `io.ReadCloser`
+// instance for 'media_uri'.
 func Open(ctx context.Context, media_uri string) (io.ReadCloser, error) {
 
 	root := filepath.Dir(media_uri)

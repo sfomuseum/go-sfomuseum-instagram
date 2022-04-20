@@ -1,6 +1,8 @@
 package media
 
+// Type Archive is a struct representing the structure of an Instagram media.json file.
 type Archive struct {
+	// Photos is the list of photos (posts) in an archive.
 	Photos []*Photo `json:"photos"`
 }
 
