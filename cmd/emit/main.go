@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/aaronland/go-json-query"
-	"github.com/sfomuseum/go-sfomuseum-instagram/document"
 	"github.com/sfomuseum/go-sfomuseum-instagram/media"
 	"github.com/sfomuseum/go-sfomuseum-instagram/walk"
 	"github.com/tidwall/pretty"
@@ -32,7 +31,7 @@ func main() {
 	append_id := flag.Bool("append-id", false, "Append a `media_id` property derived from the `path` property.")
 	append_all := flag.Bool("append-all", false, "Enable all the `-append-` flags.")
 
-	expand_caption := flag.Bool("expand-caption", false, "Parse and replace the string `caption` property with a `document.Caption` struct.")
+	expand_caption := flag.Bool("expand-caption", false, "Parse and replace the string `caption` property with a `media.Caption` struct.")
 
 	var queries query.QueryFlags
 	flag.Var(&queries, "query", "One or more {PATH}={REGEXP} parameters for filtering records.")
@@ -89,7 +88,7 @@ func main() {
 
 		if *append_timestamp {
 
-			b, err := document.AppendTakenAtTimestamp(ctx, body)
+			b, err := media.AppendTakenAtTimestamp(ctx, body)
 
 			if err != nil {
 				return err
@@ -100,7 +99,7 @@ func main() {
 
 		if *append_id {
 
-			b, err := document.AppendMediaIDFromPath(ctx, body)
+			b, err := media.AppendMediaIDFromPath(ctx, body)
 
 			if err != nil {
 				return err
@@ -111,7 +110,7 @@ func main() {
 
 		if *expand_caption {
 
-			b, err := document.ExpandCaption(ctx, body)
+			b, err := media.ExpandCaption(ctx, body)
 
 			if err != nil {
 				return err

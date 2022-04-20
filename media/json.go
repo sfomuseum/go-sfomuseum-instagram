@@ -4,38 +4,12 @@ import (
 	"context"
 	"crypto/sha1"
 	"fmt"
-	_ "github.com/sfomuseum/go-sfomuseum-instagram/caption"
 	"golang.org/x/net/html"
 	"io"
-	"log"
 	"net/url"
 	"path/filepath"
 	"time"
 )
-
-// type Caption is a struct containing data associated with the caption for an Instragram psot
-type Caption struct {
-	// Excerpt is the body of the caption
-	Excerpt string `json:"excerpt,omitempty"`
-	// Body is the body of the caption
-	Body string `json:"body"`
-	// HashTags is the list of hash tags contained in the body of the caption
-	HashTags []string `json:"hashtags,omitempty"`
-	// Users is the list of user names contained in the body of the caption
-	Users []string `json:"users,omitempty"`
-}
-
-// type Post is a struct containing data associated with an Instagram post
-type Post struct {
-	// MediaId is the SHA-1 hash of the basename for the path of the media element associated with the post
-	MediaId string `json:"media_id"`
-	// Path is the relative URI for the media element associated with the post
-	Path string `json:"path"`
-	// Taken is the datetime string when the post was published
-	TakenAt string `json:"taken_at"`
-	// Caption is the caption associated with the post
-	Caption *Caption `json:"caption"`
-}
 
 // DerivePhotosFromReader will derive zero or more Instagram photos from the body of 'r' appending
 // each to 'photos'.
@@ -50,10 +24,7 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 	var media_id string
 	var path string
 	var taken string
-	var body string
-
-	// var tags []string
-	// var users []string
+	var caption string
 
 	var f func(*html.Node)
 
@@ -85,23 +56,7 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 				}
 
 				if is_caption {
-
-					body = n.FirstChild.Data
-
-					/*
-						t, err := caption.DeriveHashTagsFromCaption(body)
-
-						if err == nil {
-							tags = t
-						}
-
-						u, err := caption.DeriveUserNamesFromCaption(body)
-
-						if err == nil {
-							users = u
-						}
-					*/
-
+					caption = n.FirstChild.Data
 					is_caption = false
 				}
 
@@ -122,34 +77,24 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 
 					if path != "" {
 
-						/*
-							c := &Caption{
-								Body:     body,
-								HashTags: tags,
-								Users:    users,
-							}
-						*/
+						fname := filepath.Base(path)
+						data := []byte(fname)
+						media_id = fmt.Sprintf("%x", sha1.Sum(data))
 
 						p := &Photo{
-							Path: path,
-							// MediaId: media_id,
+							Path:    path,
 							TakenAt: taken_at,
-							Caption: body,
+							Caption: caption,
+							MediaId: media_id,
 						}
 
 						photos = append(photos, p)
 					}
 
-					log.Println(media_id)
-
 					path = ""
 					media_id = ""
-					body = ""
+					caption = ""
 					taken = ""
-
-					// tags = []string{}
-					// users = []string{}
-
 				}
 
 			} else if n.Data == "a" {
@@ -164,12 +109,7 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 							u, err := url.Parse(a.Val)
 
 							if err == nil {
-
 								path = u.Path
-								fname := filepath.Base(path)
-
-								data := []byte(fname)
-								media_id = fmt.Sprintf("%x", sha1.Sum(data))
 							}
 
 						}
@@ -186,13 +126,7 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 
 					switch a.Key {
 					case "src":
-
 						path = a.Val
-						fname := filepath.Base(path)
-
-						data := []byte(fname)
-						media_id = fmt.Sprintf("%x", sha1.Sum(data))
-
 					default:
 						// pass
 					}
@@ -200,7 +134,6 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 
 			} else {
 			}
-
 		}
 
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
