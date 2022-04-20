@@ -11,7 +11,6 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"github.com/sfomuseum/go-sfomuseum-instagram"	
 	"github.com/sfomuseum/go-sfomuseum-instagram/media"
 	"log"
 	"os"
@@ -23,7 +22,7 @@ func main() {
 
 	ctx := context.Background()
 
-	photos := make([]*instagram.Photo, 0)
+	photos := make([]*media.Photo, 0)
 
 	paths := flag.Args()
 
@@ -44,7 +43,7 @@ func main() {
 		}
 	}
 
-	archive := instagram.Archive{
+	archive := media.Archive{
 		Photos: photos,
 	}
 

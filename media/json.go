@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha1"
 	"fmt"
-	"github.com/sfomuseum/go-sfomuseum-instagram"
 	_ "github.com/sfomuseum/go-sfomuseum-instagram/caption"
 	"golang.org/x/net/html"
 	"io"
@@ -40,7 +39,7 @@ type Post struct {
 
 // DerivePhotosFromReader will derive zero or more Instagram photos from the body of 'r' appending
 // each to 'photos'.
-func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*instagram.Photo) ([]*instagram.Photo, error) {
+func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) ([]*Photo, error) {
 
 	doc, err := html.Parse(r)
 
@@ -90,19 +89,19 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*instagra
 					body = n.FirstChild.Data
 
 					/*
-					t, err := caption.DeriveHashTagsFromCaption(body)
+						t, err := caption.DeriveHashTagsFromCaption(body)
 
-					if err == nil {
-						tags = t
-					}
+						if err == nil {
+							tags = t
+						}
 
-					u, err := caption.DeriveUserNamesFromCaption(body)
+						u, err := caption.DeriveUserNamesFromCaption(body)
 
-					if err == nil {
-						users = u
-					}
-*/
-					
+						if err == nil {
+							users = u
+						}
+					*/
+
 					is_caption = false
 				}
 
@@ -124,14 +123,14 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*instagra
 					if path != "" {
 
 						/*
-						c := &instagram.Caption{
-							Body:     body,
-							HashTags: tags,
-							Users:    users,
-						}
+							c := &Caption{
+								Body:     body,
+								HashTags: tags,
+								Users:    users,
+							}
 						*/
-						
-						p := &instagram.Photo{
+
+						p := &Photo{
 							Path: path,
 							// MediaId: media_id,
 							TakenAt: taken_at,
@@ -142,7 +141,7 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*instagra
 					}
 
 					log.Println(media_id)
-					
+
 					path = ""
 					media_id = ""
 					body = ""

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/aaronland/go-json-query"
-	"github.com/sfomuseum/go-sfomuseum-instagram"
+	"github.com/sfomuseum/go-sfomuseum-instagram/media"
 	"io"
 	_ "log"
 	"sync"
@@ -81,7 +81,7 @@ func WalkMedia(ctx context.Context, opts *WalkOptions, media_fh io.Reader) {
 		opts.DoneChannel <- true
 	}()
 
-	var archive instagram.Archive
+	var archive media.Archive
 
 	dec := json.NewDecoder(media_fh)
 	err := dec.Decode(&archive)

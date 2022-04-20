@@ -5,8 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/aaronland/go-json-query"
-	"github.com/sfomuseum/go-sfomuseum-instagram"
 	"github.com/sfomuseum/go-sfomuseum-instagram/document"
+	"github.com/sfomuseum/go-sfomuseum-instagram/media"
 	"github.com/sfomuseum/go-sfomuseum-instagram/walk"
 	"github.com/tidwall/pretty"
 	_ "gocloud.dev/blob/fileblob"
@@ -70,7 +70,7 @@ func main() {
 
 	wr := io.MultiWriter(writers...)
 
-	media_fh, err := instagram.OpenMedia(ctx, *media_uri)
+	media_fh, err := media.Open(ctx, *media_uri)
 
 	if err != nil {
 		log.Fatalf("Failed to open media file, %v", err)
