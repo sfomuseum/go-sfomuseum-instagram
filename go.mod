@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/aaronland/go-json-query v0.1.2
+	github.com/corona10/goimagehash v1.0.3
 	github.com/neurosnap/sentences v1.0.9 // indirect
 	github.com/tidwall/gjson v1.14.0
 	github.com/tidwall/pretty v1.2.0

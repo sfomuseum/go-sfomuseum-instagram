@@ -43,7 +43,7 @@ func AppendMediaIDFromPath(ctx context.Context, body []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return body, nil
 }
 

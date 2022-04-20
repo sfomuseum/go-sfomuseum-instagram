@@ -1,6 +1,11 @@
 # github.com/aaronland/go-json-query v0.1.2
 ## explicit
 github.com/aaronland/go-json-query
+# github.com/corona10/goimagehash v1.0.3
+## explicit
+github.com/corona10/goimagehash
+github.com/corona10/goimagehash/etcs
+github.com/corona10/goimagehash/transforms
 # github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 github.com/golang/groupcache/lru
 # github.com/golang/protobuf v1.5.2
@@ -15,6 +20,8 @@ github.com/googleapis/gax-go/v2/apierror
 github.com/googleapis/gax-go/v2/apierror/internal/proto
 # github.com/neurosnap/sentences v1.0.9
 ## explicit
+# github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
+github.com/nfnt/resize
 # github.com/tidwall/gjson v1.14.0
 ## explicit
 github.com/tidwall/gjson
