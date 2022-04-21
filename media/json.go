@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/url"
 	"path/filepath"
-	"time"
 )
 
 // DerivePhotosFromReader will derive zero or more Instagram photos from the body of 'r' appending
@@ -20,7 +19,6 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 		return nil, fmt.Errorf("Failed to parse HTML, %w", err)
 	}
 
-	// var media_id string
 	var path string
 	var taken string
 	var caption string
@@ -64,33 +62,18 @@ func DerivePhotosFromReader(ctx context.Context, r io.Reader, photos []*Photo) (
 					taken = n.FirstChild.Data
 					is_taken = false
 
-					taken_at := ""
-
-					t, err := time.Parse("Jan 2, 2006, 3:04 PM", taken)
-
-					if err == nil {
-						taken_at = t.Format(time.RFC3339)
-					}
-
-					// log.Println(taken ,taken_at)
-
 					if path != "" {
-
-						// fname := filepath.Base(path)
-						// media_id = DeriveMediaIdFromString(fname)
 
 						p := &Photo{
 							Path:    path,
-							TakenAt: taken_at,
+							TakenAt: taken,
 							Caption: caption,
-							// MediaId: media_id,
 						}
 
 						photos = append(photos, p)
 					}
 
 					path = ""
-					// media_id = ""
 					caption = ""
 					taken = ""
 				}
