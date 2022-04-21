@@ -9,7 +9,7 @@ import (
 )
 
 // TIME_FORMAT is a time.Parse compatible string representing the manner in which Instagram datetime strings are encoded.
-const TIME_FORMAT string = "Jan 2, 2006, 15:04 PM"
+const TIME_FORMAT string = "Jan 2, 2006, 3:04 PM"
 
 // AppendTakenCallback is a user-defined callback function to be applied to `time.Time` instances in the
 // `AppendTakenAtTimestampWithCallback` method after an initial datetime string has been parsed but before
