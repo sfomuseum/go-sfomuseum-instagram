@@ -4,7 +4,8 @@
 // files that contained machine-readable properties for working with Instagram exports. This tool
 // attempts to reconstruct that data derived from HTML markup and outputs the results as JSON to STDOUT.
 // For example:
-// 	$> bin/derive-media-json /usr/local/instagram-export/contents/posts_1.html
+//
+//	$> bin/derive-media-json /usr/local/instagram-export/contents/posts_1.html
 package main
 
 import (

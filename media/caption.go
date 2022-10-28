@@ -3,9 +3,9 @@ package media
 import (
 	"context"
 	"errors"
+	"github.com/neurosnap/sentences"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
-	"gopkg.in/neurosnap/sentences.v1/english"
 	"regexp"
 	"strings"
 )
@@ -108,11 +108,7 @@ func ParseCaption(ctx context.Context, body string) (*Caption, error) {
 		Users:    users,
 	}
 
-	tokenizer, err := english.NewSentenceTokenizer(nil)
-
-	if err != nil {
-		return nil, err
-	}
+	tokenizer := sentences.NewSentenceTokenizer(nil)
 
 	sentences := tokenizer.Tokenize(body)
 
