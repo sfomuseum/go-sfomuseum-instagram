@@ -3,22 +3,34 @@ package media
 import (
 	"context"
 	"errors"
-	"github.com/neurosnap/sentences"
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 	"regexp"
 	"strings"
+
+	"github.com/neurosnap/sentences"
+	"github.com/sfomuseum/go-sfomuseum-instagram/data"
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 )
 
 var re_hashtag *regexp.Regexp
 var re_separator *regexp.Regexp
 var re_newlines *regexp.Regexp
 
+var tokenizer *sentences.DefaultSentenceTokenizer
+
 func init() {
 
 	re_hashtag = regexp.MustCompile(`.*(((?:#|@)([^#@\s]+)\s?)+)$`)
 	re_separator = regexp.MustCompile(`(\.?\n\.)+$`)
 	re_newlines = regexp.MustCompile(`\n`)
+
+	training, err := sentences.LoadTraining(data.English)
+
+	if err != nil {
+		panic(err)
+	}
+
+	tokenizer = sentences.NewSentenceTokenizer(training)
 }
 
 type Caption struct {
@@ -107,8 +119,6 @@ func ParseCaption(ctx context.Context, body string) (*Caption, error) {
 		Hashtags: hashtags,
 		Users:    users,
 	}
-
-	tokenizer := sentences.NewSentenceTokenizer(nil)
 
 	sentences := tokenizer.Tokenize(body)
 
