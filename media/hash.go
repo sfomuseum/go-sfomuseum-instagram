@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"path/filepath"
+
 	"github.com/sfomuseum/go-sfomuseum-instagram/hash"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
 	"gocloud.dev/blob"
-	"io"
-	"path/filepath"
 )
 
 // type AppendHashesOptions provides configuration options for appending hashes to an Instagram post.

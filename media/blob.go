@@ -3,9 +3,10 @@ package media
 import (
 	"context"
 	"fmt"
-	"gocloud.dev/blob"
 	"io"
 	"path/filepath"
+
+	"gocloud.dev/blob"
 )
 
 // Open is a convenience method to create a new `blob.Bucket` instance derived from the

@@ -4,11 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/aaronland/go-json-query"
-	"github.com/sfomuseum/go-sfomuseum-instagram/media"
-	"github.com/sfomuseum/go-sfomuseum-instagram/walk"
-	"github.com/tidwall/pretty"
-	_ "gocloud.dev/blob/fileblob"
 	"io"
 	"io/ioutil"
 	"log"
@@ -16,6 +11,12 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+
+	"github.com/aaronland/go-json-query"
+	"github.com/sfomuseum/go-sfomuseum-instagram/media"
+	"github.com/sfomuseum/go-sfomuseum-instagram/walk"
+	"github.com/tidwall/pretty"
+	_ "gocloud.dev/blob/fileblob"
 )
 
 func main() {

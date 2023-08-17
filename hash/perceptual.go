@@ -2,9 +2,12 @@ package hash
 
 import (
 	"fmt"
-	"github.com/corona10/goimagehash"
 	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
+
+	"github.com/corona10/goimagehash"
 )
 
 // PerceptualHash will return the perceptual for the image contained in 'r'.

@@ -4,10 +4,11 @@ import (
 	"context"
 	"crypto/sha1"
 	"fmt"
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 	"path/filepath"
 	"strings"
+
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 )
 
 // DeriveMediaIdFromString returns the SHA-1 value of 'input'. Because Instagram

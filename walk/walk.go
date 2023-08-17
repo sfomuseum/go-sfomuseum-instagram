@@ -3,11 +3,12 @@ package walk
 import (
 	"context"
 	"encoding/json"
-	"github.com/aaronland/go-json-query"
-	"github.com/sfomuseum/go-sfomuseum-instagram/media"
 	"io"
 	_ "log"
 	"sync"
+
+	"github.com/aaronland/go-json-query"
+	"github.com/sfomuseum/go-sfomuseum-instagram/media"
 )
 
 type WalkOptions struct {

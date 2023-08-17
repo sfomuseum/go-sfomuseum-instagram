@@ -12,9 +12,10 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"github.com/sfomuseum/go-sfomuseum-instagram/media"
 	"log"
 	"os"
+
+	"github.com/sfomuseum/go-sfomuseum-instagram/media"
 )
 
 func main() {

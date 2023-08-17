@@ -3,10 +3,11 @@ package media
 import (
 	"context"
 	"fmt"
-	"golang.org/x/net/html"
 	"io"
 	"net/url"
 	"path/filepath"
+
+	"golang.org/x/net/html"
 )
 
 // DerivePhotosFromReader will derive zero or more Instagram photos from the body of 'r' appending

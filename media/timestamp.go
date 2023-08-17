@@ -3,9 +3,10 @@ package media
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
-	"time"
 )
 
 // TIME_FORMAT is a time.Parse compatible string representing the manner in which Instagram datetime strings are encoded.
